@@ -10,20 +10,14 @@ def evaluate(game_state, map_layout, players_status, player_status, phase=None):
 
     # 4.5.12
     def our_expected_reinforcements_feature():
-        pass
+        our_expected_reinforcements = max(player_status['num_territories'] / 3, 3)
+        player_territory_ids = [t['territory'] for t in player_status['territories']]
+        for c in map_layout['continents']:
+            if set(c['territories']).issubset(set(player_territory_ids)):
+                our_expected_reinforcements += c['continent_bonus']
+        return our_expected_reinforcements
 
-def _generate_continent_ratings(map_layout):
-    continent_rating = {}
-    for continent in map_layout['continents']:
-        border_territories = []
-        for territory_id in continent['territories']:
-            for adjacent_id in map_layout['territories'][territory_id-1]['adjacent_territories']:
-                if adjacent_id not in continent['territories']:
-                    border_territories.append(territory_id)
-                    break
-        continent_rating[continent['continent']] = float(15 + continent['continent_bonus'] - 4 * len(border_territories)) / len(continent['territories'])
-    def f(continent_id):
-        return continent_rating[continent_id]
-    return f
+    def enemy_expected_reinforcements_feature():
+        players = players_status['players']
+        enemy_status = players_status['players'][0] if players_status['players'][0]
 
-continent_rating = _generate_continent_rating(map_layout)

@@ -61,6 +61,11 @@ class Brisk(object):
     def get_player_status(self, lite=False):
         return self.get(self.url_player() + {False:"", True:"?check_turn=true"}[lite])
 
+    def get_enemy_status(self):
+        players = self.get_players_status()['players']
+        enemy_id = players[0]['player'] if players[0]['player'] is not self.player_id else players[1]['player']
+        return self.get(self.url_game() + "/player/" + str(enemy_id))
+
     def get_players_status(self):
         return self.get(self.url_game() + "/players")
 
