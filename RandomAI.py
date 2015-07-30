@@ -55,6 +55,9 @@ class RandomAI(Brisk.Brisk):
             for a in adjacent_territories:
                 if territories[a-1]['player'] is not self.player_id:
                     battles.append((t, territories[a-1]))
+        # battles = [battle]
+        # battle = (territory, territory)
+        # territory = {'territory': 2, 'num_armies': 3, 'player': 1}
         return battles
 
     def _choose_best_battle(self, battles):
@@ -62,7 +65,28 @@ class RandomAI(Brisk.Brisk):
 
     def do_fortify(self):
         print "FORTIFY"
-        return False
+        fortifications = self._create_set_of_legal_fortifications()
+        best_fortification = self._choose_best_fortification(fortifications)
+        self.transfer_armies(best_fortification[0]['territory'],
+            best_fortification[1]['territory'],
+            best_fortification[0]['num_armies'] - 1)
+
+        return True
+
+    def _create_set_of_legal_fortifications(self):
+        fortifications = []
+        territories = self.get_game_state()['territories']
+        ours = filter(lambda t: t['player'] is self.player_id and t['num_armies'] > 1, territories)
+        for t in ours:
+            adjacent_territories = self.map_layout['territories'][t['territory']-1]['adjacent_territories']
+            for a in adjacent_territories:
+                if territories[a-1]['player'] is self.player_id:
+                    fortifications.append((t, territories[a-1]))
+
+        return fortifications
+
+    def _choose_best_fortification(self, fortifications):
+        return random.choice(fortifications)
 
 if __name__ == "__main__":
     s = RandomAI()
