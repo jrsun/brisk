@@ -13,17 +13,17 @@ class SubmissiveAI(Brisk.Brisk):
         while True:
             while self.get_player_status(True)['current_turn'] is False:
                 time.sleep(POLL_TIME)
-            self.reinforce()
-            self.attack()
-            self.fortify() or self.end_turn()
+            self.do_reinforce()
+            self.do_attack()
+            self.do_fortify() or self.end_turn()
 
-    def reinforce(self):
+    def do_reinforce(self):
         return False
 
-    def attack(self):
+    def do_attack(self):
         return False
 
-    def fortify(self):
+    def do_fortify(self):
         return False
 
 if __name__ == "__main__":

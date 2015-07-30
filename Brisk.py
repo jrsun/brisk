@@ -30,6 +30,7 @@ class Brisk(object):
 
     def post(self, url, data):
         req = urllib2.Request(url, json.dumps(data))
+        print url, data
         response = urllib2.urlopen(req)
         res = response.read()
         try:
