@@ -30,14 +30,22 @@ class Brisk(object):
 
     def post(self, url, data):
         req = urllib2.Request(url, json.dumps(data))
-        print url, data
-        response = urllib2.urlopen(req)
+        try:
+            response = urllib2.urlopen(req)
+        except urllib2.HTTPError, e:
+            import pprint
+            pp = pprint.PrettyPrinter()
+            pp.pprint(self.get_game_state())
+            pp.pprint(self.get_player_status())
+            print url
+            pp.pprint(data)
+            raise e
         res = response.read()
         try:
-          return json.loads(res)
+            return json.loads(res)
         except ValueError:
-          # probably empty respose so no JSON to decode
-          return res
+            # probably empty respose so no JSON to decode
+            return res
 
     def get(self, url):
         req = urllib2.Request(url)
@@ -52,6 +60,11 @@ class Brisk(object):
         
     def get_player_status(self, lite=False):
         return self.get(self.url_player() + {False:"", True:"?check_turn=true"}[lite])
+
+    def get_territory_status(self, territory_id):
+        territory = self.get_map_layout()['territories'][territory_id-1]
+        territory.update(self.get_game_state()['territories'][territory_id-1])
+        return territory
 
     def end_turn(self):
         return self.post(self.url_player(), {'token':self.token, 'end_turn':True})

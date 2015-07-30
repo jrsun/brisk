@@ -2,7 +2,7 @@ import Brisk
 import time
 
 times = []
-SAMPLE_SIZE = 5
+SAMPLE_SIZE = 1
 POLL_TIME = 1 # seconds
 for i in xrange(SAMPLE_SIZE):
 	b = Brisk.Brisk()
