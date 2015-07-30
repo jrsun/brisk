@@ -61,6 +61,9 @@ class Brisk(object):
     def get_player_status(self, lite=False):
         return self.get(self.url_player() + {False:"", True:"?check_turn=true"}[lite])
 
+    def get_players_status(self):
+        return self.get(self.url_game() + "/players")
+
     def get_territory_status(self, territory_id):
         territory = self.get_map_layout()['territories'][territory_id-1]
         territory.update(self.get_game_state()['territories'][territory_id-1])
