@@ -1,6 +1,7 @@
 import Brisk
 import time
 import random
+import itertools
 
 POLL_TIME = 0.5 # seconds
 
@@ -31,7 +32,25 @@ class RandomAI(Brisk.Brisk):
         return False
 
     def attack(self):
+        battles = self._create_set_of_legal_battles()
+        best_battle = self._choose_best_battle(battles)
+        
+        armies = self.
         return False
+
+    def _create_set_of_legal_battles(self):
+        territories = self.get_game_state()['territories']
+        ours = []
+        theirs = []
+        for t in territories:
+            if t['player'] is self.player_id:
+                ours.append(t['territory'])
+            else:
+                theirs.append(t['territory'])
+        return list(itertools.product(ours, theirs))
+
+    def _choose_best_battle(self, battles):
+        return random.choice(battles)
 
     def fortify(self):
         return False
