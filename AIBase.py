@@ -53,6 +53,7 @@ class AIBase(Brisk.Brisk):
         for continent in map_layout['continents']:
             border_territories = []
             for territory_id in continent['territories']:
+                #TODO no index-1
                 for adjacent_id in map_layout['territories'][territory_id-1]['adjacent_territories']:
                     if adjacent_id not in continent['territories']:
                         border_territories.append(territory_id)
