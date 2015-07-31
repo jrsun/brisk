@@ -26,8 +26,9 @@ class Battle_Evaluator():
         win_player_status = copy.deepcopy(player_status)
         win_enemy_status = copy.deepcopy(enemy_status)
         win_src = get_territory_by_id(action[0]['territory'], win_player_status['territories'])
-        win_src['num_armies'] = (win_src['num_armies'] / 2) + 1
         win_dest = get_territory_by_id(action[1]['territory'], win_enemy_status['territories'])
+        win_src['num_armies'] = max(win_src['num_armies'] - win_dest['num_armies'], 1) # Expected winner loss
+        win_dest['num_armies'] = 3 # Expected number of troops moved
         win_player_status['territories'].append(win_dest)
         win_enemy_status['territories'].remove(win_dest)
         win_state = {
@@ -40,8 +41,9 @@ class Battle_Evaluator():
         lose_player_status['num_armies'] -= (src['num_armies'] - 1)
         lose_enemy_status = copy.deepcopy(enemy_status)
         lose_src = get_territory_by_id(action[0]['territory'], lose_player_status['territories'])
-        lose_src['num_armies'] = 1
+        lose_src['num_armies'] = 1 # Number of troops remaining on battle loss
         lose_dest = get_territory_by_id(action[1]['territory'], lose_enemy_status['territories'])
+        lose_dest['num_armies'] = lose_dest['num_armies'] / 2 + 1 # Expected enemy troop loss
         lose_state = {
             'player_status': lose_player_status,
             'enemy_status': lose_enemy_status
