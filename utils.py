@@ -8,3 +8,8 @@ def get_territory_by_id(tid, territories):
         if t['territory'] == tid:
             return t
     return None
+
+def wrapper(func, *args, **kwargs):
+    def wrapped():
+        return func(*args, **kwargs)
+    return wrapped

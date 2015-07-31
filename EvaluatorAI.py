@@ -5,6 +5,7 @@ class EvaluatorAI(AIBase.AIBase):
 
     def __init__(self):
         super(EvaluatorAI, self).__init__()
+        self.re = Reinforcement_Evaluator.Reinforcement_Evaluator()
 
     def reinforce(self, num_reserves):
         ''' Returns {<territoryId>: <num troops deployed>} '''
@@ -20,7 +21,10 @@ class EvaluatorAI(AIBase.AIBase):
 
     def _choose_best_reinforce(self, legal_territories_to_reinforce):
         ''' Returns best territory_id to place an army '''
-        return legal_territories_to_reinforce[0]['territory']
+        score = {}
+        for territory in legal_territories_to_reinforce:
+            score[self.re.evaluate_action(territory, self.map_layout, self.player_status, self.get_enemy_status())] = territory
+        return score[max(score)]['territory']
 
     def battle(self, legal_territories_to_attack):
         ''' Returns (attack, defend, num_armies_to_attack), or a None value if not attacking '''
@@ -32,3 +36,12 @@ class EvaluatorAI(AIBase.AIBase):
 if __name__ == '__main__':
     bot = EvaluatorAI()
     bot.run()
+    # import time
+    # time.sleep(5)
+    # bot._refresh_state()
+    # def test_timing():
+    #     bot.re.evaluate_action(bot.player_status['territories'][0], bot.map_layout, bot.player_status, bot.get_enemy_status())
+    # import timeit
+    # print "Waiting... "
+    # print "Evaluate (s): " + str(timeit.Timer(test_timing).timeit(number=1)/1)
+    # bot.run()

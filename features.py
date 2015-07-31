@@ -93,7 +93,7 @@ def own_occupied_continents_feature(map_layout, player_status, enemy_status):
     #     our_expected_reinforcements_feature() * 0.2 + \
     #     own_occupied_continents_feature() * 1.0
 
-def evaluate(map_layout, player_status, enemy_status):
+def evaluate(map_layout, player_status, enemy_status): # 0.0001
     return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
         enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
         enemy_occupied_continents_feature(map_layout, player_status, enemy_status) * -0.3 + \
@@ -104,15 +104,16 @@ def evaluate(map_layout, player_status, enemy_status):
         own_occupied_continents_feature(map_layout, player_status, enemy_status) * 1.0
 
 if __name__ == "__main__":
-    import Brisk
-    b = Brisk.Brisk()
+    import AIBase
+    b = AIBase.AIBase()
     print b.game_id
-    time.sleep(10)
+    time.sleep(5)
+    b._refresh_state()
     map_layout = b.get_map_layout()
     player_status = b.get_player_status()
     enemy_status = b.get_enemy_status()
-    def test_evaluate():
-        evaluate(map_layout, player_status, enemy_status)
+    from utils import wrapper
+    wrapped = wrapper(evaluate, b.map_layout, b.player_status, b.get_enemy_status())
     import timeit
-    print "Evaluate (s): " + str(timeit.Timer(test_evaluate).timeit(number=100)/100)
+    print "Evaluate (s): " + str(timeit.Timer(wrapped).timeit(number=100)/100)
         
