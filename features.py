@@ -1,9 +1,8 @@
 import time
-#def evaluate(map_layout, player_status, players_status, enemy_status, phase=None, debug=False):
     
 # 4.5.1
 def armies_feature():
-    return float(player_status['num_armies']) / sum([player['num_armies'] for player in players_status['players']])
+    return float(player_status['num_armies']) / (player_status['num_armies'] + enemy_status['num_armies'])
 
 # TODO: 4.5.2 - 4.5.5
 
@@ -51,7 +50,7 @@ def more_than_one_army_feature():
 
 # 4.5.11
 def occupied_territories_feature():
-    return float(len(player_status['territories'])) / sum([player['num_territories'] for player in players_status['players']])
+    return float(len(player_status['territories'])) / (len(player_status['territories']) + len(enemy_status['territories']))
 
 # 4.5.12
 def our_expected_reinforcements_feature():
@@ -111,7 +110,6 @@ if __name__ == "__main__":
     time.sleep(10)
     map_layout = b.get_map_layout()
     player_status = b.get_player_status()
-    players_status = b.get_players_status()
     enemy_status = b.get_enemy_status()
     import timeit
     print "Conts: " + str(timeit.Timer(evaluate).timeit(number=100)/100)

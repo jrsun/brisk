@@ -1,4 +1,4 @@
-import AIBase
+import AIBase, utils
 import time
 
 class MovingTankAI(AIBase.AIBase):
