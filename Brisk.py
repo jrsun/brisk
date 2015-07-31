@@ -1,5 +1,6 @@
 import json
 import urllib2, time
+import config
 
 class Brisk(object):
     HOST = 'http://www.briskchallenge.com'
@@ -12,6 +13,7 @@ class Brisk(object):
         self.token = res['token']
 
     def join_game(self, game_id, bot_id):
+        # data = { 'join': True, 'team_name': self.TEAM_NAME, 'token': config.TOKEN, "no_bot": True, "game": 1662066685}
         data = { 'join': True, 'team_name': self.TEAM_NAME }
         res = self.post(self.url_root(), data)
         return res

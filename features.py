@@ -178,31 +178,64 @@ def evaluate_reinforce(map_layout, player_status, enemy_status): # 0.0001
     # armies_feature is constant
     # return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
     return continent_safety_feature(map_layout, player_status, enemy_status) * -0.5 + \
-        continent_threat_feature(map_layout, player_status, enemy_status) * 0.05 + \
+        continent_threat_feature(map_layout, player_status, enemy_status) * 1 + \
         enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
         distance_to_frontier_feature(map_layout, player_status, enemy_status) * 5
         # more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.05
 
 def evaluate_battle(map_layout, player_status, enemy_status): # 0.0001
-    return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
-        continent_safety_feature(map_layout, player_status, enemy_status) * -0.01 + \
-        continent_threat_feature(map_layout, player_status, enemy_status) * 0.05 + \
-        enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
-        enemy_occupied_continents_feature(map_layout, player_status, enemy_status) * -0.5 + \
-        hinterland_feature(map_layout, player_status, enemy_status) * 0.1 + \
-        more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.1 + \
-        occupied_territories_feature(map_layout, player_status, enemy_status) * 0.7 + \
-        our_expected_reinforcements_feature(map_layout, player_status, enemy_status) * 0.2 + \
-        own_occupied_continents_feature(map_layout, player_status, enemy_status) * 0.7
+    a = armies_feature(map_layout, player_status, enemy_status)
+    b = continent_safety_feature(map_layout, player_status, enemy_status)
+    c = continent_threat_feature(map_layout, player_status, enemy_status)
+    d = enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status)
+    e = enemy_occupied_continents_feature(map_layout, player_status, enemy_status)
+    f = hinterland_feature(map_layout, player_status, enemy_status)
+    g = more_than_one_army_feature(map_layout, player_status, enemy_status)
+    h = occupied_territories_feature(map_layout, player_status, enemy_status)
+    i = our_expected_reinforcements_feature(map_layout, player_status, enemy_status)
+    j = own_occupied_continents_feature(map_layout, player_status, enemy_status)
+    print "armies feature: %f" % a
+    print "continent safety feature: %f" % b
+    print "continent threat feature: %f" % c
+    print "enemy expected reinforcements feature: %f" % d
+    print "enemy occupied continents feature: %f" % e
+    print "hinterland feature: %f" % f
+    print "more than one army feature: %f" % g
+    print "occupied territories feature: %f" % h
+    print "our expected reinforcements feature: %f" % i
+    print "own occupied continents feature: %f" % j
+    print "\n"
+    # Continent first strategy
+    # return a * 1 * 0.05 + \
+    #     b * 0.2 * -0.1 + \
+    #     c * 0.05 * 0.2 + \
+    #     d * 0.02 * -0.1 + \
+    #     e * 0.1 * -0.2 + \
+    #     f * 0.033 * 0.001 + \
+    #     g * 1 * -0.05 + \
+    #     h * 1 * 0.3 + \
+    #     i * 0.05 * 0.3 + \
+    #     j * 0.2 * 0.5
+    # Aggressive conquest, with focus on continent protection
+    return a * 1 * 0.1 + \
+    b * 0.2 * -10 + \
+    c * 0.05 * 0.1 + \
+    d * 0.02 * -0.1 + \
+    e * 0.1 * -0.1 + \
+    f * 0.033 * 0.1 + \
+    g * 1 * -0.1 + \
+    h * 1 * 50 + \
+    i * 0.05 * 1 + \
+    j * 0.2 * 1
 
 def evaluate_fortify(map_layout, player_status, enemy_status): # 0.0001
     # armies feature is constant
     # return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
     return continent_safety_feature(map_layout, player_status, enemy_status) * -0.3 + \
-        continent_threat_feature(map_layout, player_status, enemy_status) * 0.05 + \
+        continent_threat_feature(map_layout, player_status, enemy_status) * 1 + \
         enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
         more_than_one_army_feature(map_layout, player_status, enemy_status) * 0.1 + \
-        distance_to_frontier_feature(map_layout, player_status, enemy_status) * 5
+        distance_to_frontier_feature(map_layout, player_status, enemy_status) * 7
 
 if __name__ == "__main__":
     import AIBase

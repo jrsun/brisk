@@ -53,7 +53,6 @@ class EvaluatorAI(AIBase.AIBase):
             score[self.be.evaluate_action(battle, self.map_layout, self.player_status, self.enemy_status)] = battle
         if len(score) == 0 or max(score) - curr_score <= 0.5:
             return None
-        print max(score) - curr_score
         return score[max(score)]
 
     def fortify(self, legal_territories_to_fortify):
