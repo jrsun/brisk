@@ -1,5 +1,6 @@
 import time
 from utils import get_territory_by_id
+from collections import deque
     
 # 4.5.1
 def armies_feature(map_layout, player_status, enemy_status):
@@ -64,6 +65,27 @@ def _our_threat(t_id, map_layout, player_status, enemy_status):
     return bsr
 
 # TODO: 4.5.5 - distance to frontier
+def distance_to_frontier_feature(map_layout, player_status, enemy_status):
+    td = 0
+    for t in player_status['territories']:
+        td += (_distance(t['territory'], map_layout, player_status, enemy_status) * t['num_armies'])
+    return float(player_status['num_armies']) / td
+
+def _distance(t_id, map_layout, player_status, enemy_status):
+    q = deque()
+    path = (t_id, )
+    q.append(path)
+    visited = set([t_id])
+    while q:
+        path = q.popleft()
+        last_node = path[-1]
+        if get_territory_by_id(last_node, enemy_status['territories']):
+            return len(path) - 1
+        for node in get_territory_by_id(last_node, map_layout['territories'])['adjacent_territories']:
+            if node not in visited:
+                visited.add(node)
+                q.append(path + (node, ))
+    return 99999
 
 # 4.5.6
 def enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status):
