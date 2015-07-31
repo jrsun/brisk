@@ -6,7 +6,7 @@ class Reinforcement_Evaluator():
 		pass
 
 	# action = territory object
-	def evaluate(self, action, map_layout, player_status, enemy_status):
+	def evaluate_action(self, action, map_layout, player_status, enemy_status):
 		(sim_map_layout, sim_player_status, sim_enemy_status) = self._simulate(action, map_layout, player_status, enemy_status)
 		return features.evaluate(sim_map_layout, sim_player_status, sim_enemy_status)
 

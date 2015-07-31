@@ -111,6 +111,8 @@ if __name__ == "__main__":
     map_layout = b.get_map_layout()
     player_status = b.get_player_status()
     enemy_status = b.get_enemy_status()
+    def test_evaluate():
+        evaluate(map_layout, player_status, enemy_status)
     import timeit
-    print "Conts: " + str(timeit.Timer(evaluate).timeit(number=100)/100)
+    print "Evaluate (s): " + str(timeit.Timer(test_evaluate).timeit(number=100)/100)
         
