@@ -5,10 +5,44 @@ from utils import get_territory_by_id
 def armies_feature(map_layout, player_status, enemy_status):
     return float(player_status['num_armies']) / (player_status['num_armies'] + enemy_status['num_armies'])
 
-# TODO: 4.5.2 - 4.5.5
+# 4.5.2 - not useful
+
+# 4.5.3ish
+def continent_safety_feature(map_layout, player_status, enemy_status):
+    player_occupied_continents = []
+    player_territory_ids = [t['territory'] for t in player_status['territories']]
+    for c in map_layout['continents']:
+        if set(c['territories']).issubset(set(player_territory_ids)):
+            player_occupied_continents.append(c)
+
+    continent_safety_feature = 0
+    for c in player_occupied_continents:
+        total_border_threat = 0
+        for border_territory_id in c['border_territories']:
+            total_border_threat += _enemy_threat(border_territory_id, map_layout, player_status, enemy_status)
+        total_border_threat *= c['rating']
+        continent_safety_feature += total_border_threat
+    return continent_safety_feature
+
+# 4.5.4ish
+def continent_threat_feature(map_layout, player_status, enemy_status):
+    enemy_occupied_continents = []
+    enemy_territory_ids = [t['territory'] for t in enemy_status['territories']]
+    for c in map_layout['continents']:
+        if set(c['territories']).issubset(set(enemy_territory_ids)):
+            enemy_occupied_continents.append(c)
+
+    continent_threat_feature = 0
+    for c in enemy_occupied_continents:
+        total_border_threat = 0
+        for border_territory_id in c['border_territories']:
+            total_border_threat += _our_threat(border_territory_id, map_layout, player_status, enemy_status)
+        total_border_threat *= c['rating']
+        continent_threat_feature += total_border_threat
+    return continent_threat_feature
 
 # assumes t_id in player territories
-def _threat(t_id, map_layout, player_status, enemy_status):
+def _enemy_threat(t_id, map_layout, player_status, enemy_status):
     bst = 0
     enemy_territory_ids = [t['territory'] for t in enemy_status['territories']]
     player_territory_ids = [t['territory'] for t in player_status['territories']]
@@ -17,6 +51,19 @@ def _threat(t_id, map_layout, player_status, enemy_status):
             bst += get_territory_by_id(adjacent_id, enemy_status['territories'])['num_armies']
     bsr = float(bst) / get_territory_by_id(t_id, player_status['territories'])['num_armies']
     return bsr
+
+# assumes t_id in enemy territories
+def _our_threat(t_id, map_layout, player_status, enemy_status):
+    bst = 0
+    enemy_territory_ids = [t['territory'] for t in enemy_status['territories']]
+    player_territory_ids = [t['territory'] for t in player_status['territories']]
+    for adjacent_id in get_territory_by_id(t_id, map_layout['territories'])['adjacent_territories']:
+        if adjacent_id in player_territory_ids:
+            bst += get_territory_by_id(adjacent_id, player_status['territories'])['num_armies']
+    bsr = float(bst) / get_territory_by_id(t_id, enemy_status['territories'])['num_armies']
+    return bsr
+
+# TODO: 4.5.5 - distance to frontier
 
 # 4.5.6
 def enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status):
@@ -107,13 +154,15 @@ def own_occupied_continents_feature(map_layout, player_status, enemy_status):
 
 def evaluate(map_layout, player_status, enemy_status): # 0.0001
     return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
+        continent_safety_feature(map_layout, player_status, enemy_status) * -0.01 + \
+        continent_threat_feature(map_layout, player_status, enemy_status) * 0.05 + \
         enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
         enemy_occupied_continents_feature(map_layout, player_status, enemy_status) * -0.3 + \
         hinterland_feature(map_layout, player_status, enemy_status) * 0.3 + \
         more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.1 + \
         occupied_territories_feature(map_layout, player_status, enemy_status) * 0.2 + \
         our_expected_reinforcements_feature(map_layout, player_status, enemy_status) * 0.2 + \
-        own_occupied_continents_feature(map_layout, player_status, enemy_status) * 1.0
+        own_occupied_continents_feature(map_layout, player_status, enemy_status) * 2.0
 
 if __name__ == "__main__":
     import AIBase
@@ -121,7 +170,7 @@ if __name__ == "__main__":
     print b.game_id
     time.sleep(5)
     b._refresh_state()
-    map_layout = b.get_map_layout()
+    map_layout = b.map_layout
     player_status = b.get_player_status()
     enemy_status = b.get_enemy_status()
     # from utils import wrapper

@@ -81,14 +81,14 @@ class AIBase(Brisk.Brisk):
     def _generate_continent_ratings(self):
         self.continent_rating = {}
         for continent in self.map_layout['continents']:
-            border_territories = []
+            continent['border_territories'] = []
             for territory_id in continent['territories']:
                 #TODO no index-1
                 for adjacent_id in self.map_layout['territories'][territory_id-1]['adjacent_territories']:
                     if adjacent_id not in continent['territories']:
-                        border_territories.append(territory_id)
+                        continent['border_territories'].append(territory_id)
                         break
-            self.continent_rating[continent['continent']] = float(15 + continent['continent_bonus'] - 4 * len(border_territories)) / len(continent['territories'])
+            continent['rating'] = float(15 + continent['continent_bonus'] - 4 * len(continent['border_territories'])) / len(continent['territories'])
 
     def _refresh_state(self):
         self.game_state = self.get_game_state()
