@@ -1,40 +1,81 @@
-import Brisk
-import sys
+import Brisk, config
+import sys, time, json
+
+# Error codes
+
+class ReinforceError(object):
+    _prefix = "ReinforceError: "
+    LEFTOVER_ARMY = _prefix + "You did not deploy all of your troops."
+    TOO_MUCH_ARMY = _prefix + "You deployed more troops than you have."
+    def TERRITORY_NOT_OWNED(territoryIds):
+        return "%sYou don't own the following territories: %s" % (_prefix, str(territoryIds))
+
+class AttackError(object):
+    _prefix = "AttackError: "
+    def ILLEGAL_ATTACK(tattack, tdefend):
+        return "%sCannot attack %d from %d: they are not adjacent, or you do not own the attacking territory." % (_prefix, tdefend, tattack)
+    def NOT_ENOUGH_ARMY(tattack, tdefend, num_armies):
+        return "%sCannot attack %d from %d: less than %d armies to move." % (_prefix, tdefend, tattack, num_armies)
+    def TOO_MUCH_ARMY(tattack, tdefend, num_armies):
+        return "%sCannot attack %d from %d with %d armies: cannot attack with more than 3 armies" % (_prefix, tdefend, tattack, num_armies)
+
+class FortifyError(object):
+    _prefix = "FortifyError: "
+    def ILLEGAL_FORTIFY(tfrom, tto):
+        return "%sCannot fortify from %d to %d: they are not adjacent, or you do not own at least one of the territories." % (_prefix, tfrom, tto)
+    def NOT_ENOUGH_ARMY(tfrom, tto, num_armies):
+        return "%sCannot fortify from %d to %d: less than %d armies to move." % (_prefix, tfrom, tto, num_armies)
+
+
+
+# Public standalone utilities
+
+def pp(jsonObject):
+    ''' Pretty prints json '''
+    json.dumps(jsonObject, indent=4)
+
+# Could optimize this
+def get_territory_by_id(tid, territories):
+    for t in territories:
+        if t['territory'] == tid:
+            return t
+    return None
+
+
 
 class AIBase(Brisk.Brisk):
 
     # Methods to be implemented by subclasses
 
-    def reinforce(num_reserves):
+    def reinforce(self, num_reserves):
         ''' Returns {<territoryId>: <num troops deployed>} '''
         pass
 
-    def attack(legal_territories_to_attack):
-        ''' Returns (attack, defend), or a None value if not attacking '''
+    def battle(self, legal_territories_to_attack):
+        ''' Returns (attack, defend, num_armies_to_attack), or a None value if not attacking '''
         pass
 
-    def fortify(legal_territories_to_fortify):
-        ''' Returns (from_territory, to_territory), or a None value if ending turn '''
+    def fortify(self, legal_territories_to_fortify):
+        ''' Returns (from_territory, to_territory, num_armies_to_move), or a None value if ending turn '''
         pass
 
-
-    # Error codes
-
-    class ReinforceError(object):
-        _prefix = "ReinforceError: "
-        LEFTOVER_ARMY = _prefix + "You did not deploy all of your troops."
-        TOO_MUCH_ARMY = _prefix + "You deployed more troops than you have."
-
-    class FortifyError(object):
-        _prefix = "FortifyError: "
-
-        def NOT_ADJACENT(tFrom, tTo):
-            return "%sCannot fortify from %d to %d: they are not adjacent." % (_prefix, tFrom, tTo))
-        def NOT_ENOUGH_ARMIES(tFrom, tTo, num_armies):
-            return "%sCannot fortify from %d to %d: less than %d armies to move." % (_prefix, tFrom, tTo, num_armies)
 
 
     # Private utilities
+
+    def _create_set_of_legal_battles(self):
+        battles = []
+        territories = self.get_game_state()['territories']
+        ours = filter(lambda t: t['player'] is self.player_id and t['num_armies'] > 1, territories)
+        for t in ours:
+            adjacent_territories = self.map_layout['territories'][t['territory']-1]['adjacent_territories']
+            for a in adjacent_territories:
+                if territories[a-1]['player'] is not self.player_id:
+                    battles.append((t, territories[a-1]))
+        # battles = [battle]
+        # battle = (territory, territory)
+        # territory = {'territory': 2, 'num_armies': 3, 'player': 1}
+        return battles
 
     def _create_set_of_legal_fortifications(self):
         fortifications = []
@@ -48,91 +89,24 @@ class AIBase(Brisk.Brisk):
 
         return fortifications
 
-    def _generate_continent_ratings(map_layout):
-        continent_rating = {}
-        for continent in map_layout['continents']:
+    def _generate_continent_ratings(self):
+        self.continent_rating = {}
+        for continent in self.map_layout['continents']:
             border_territories = []
             for territory_id in continent['territories']:
                 #TODO no index-1
-                for adjacent_id in map_layout['territories'][territory_id-1]['adjacent_territories']:
+                for adjacent_id in self.map_layout['territories'][territory_id-1]['adjacent_territories']:
                     if adjacent_id not in continent['territories']:
                         border_territories.append(territory_id)
                         break
-            continent_rating[continent['continent']] = float(15 + continent['continent_bonus'] - 4 * len(border_territories)) / len(continent['territories'])
-        def f(continent_id):
-            return continent_rating[continent_id]
-        return f
+            self.continent_rating[continent['continent']] = float(15 + continent['continent_bonus'] - 4 * len(border_territories)) / len(continent['territories'])
 
-    # Public utilities
-
-    def pp(jsonObject):
-        ''' Pretty prints json '''
-        json.dumps(jsonObject, indents=4)
-
-    def getTerritoryById(tid, territories):
-        for t in territories:
-            if t['territory'] == tid:
-                return t
-
-    continent_rating = _generate_continent_rating(map_layout)
-
-
-    # Core AI execution methods
-
-    def __init__(self):
-        super(AIBase, self).__init__()
-        self.map_layout = self.get_map_layout()
-        self.refresh_state()
-
-    def do_reinforce(self):
-        num_reserves = self.player_status['num_reserves']
-        reinforcements = self.reinforce(num_reserves)
-
-        num_deployed = sum(reinforcements.values))
-        # All troops must be deployed
-        if (num_deployed < num_reserves)
-            err(ReinforceError.LEFTOVER_ARMY)
-        # Cannot deploy too many troops
-        elif (num_deployed > num_reserves):
-            err(ReinforceError.TOO_MUCH_ARMY)
-
-        # Execute reinforcement
-        for territoryId, num_troops in reinforcements:
-            self.place_armies(territoryId, num_troops)
-
-
-    def do_attack(self):
-        
-
-    def do_fortify(self):
-        legal_forts = self._create_set_of_legal_fortifications()
-        fortification = self.fortify(legal_forts)
-
-        if fortification:
-            tFrom, tTo, num_armies = fortification
-            # Fortification must occur between adjacent territories
-            if fortification not in legal_forts:
-                err(FortifyError.NOT_ADJACENT(tFrom, tTo))
-            else:
-                t = getTerritoryById(tFrom, self.player_status['territories'])
-                # There must be enough troops to move
-                if num_armies > t.num_armies - 1:
-                    err(FortifyError.NOT_ENOUGH_ARMIES(tFrom, tTo, num_armies))
-                else:
-                    # Everything is valid
-                    self.transfer_armies(tFrom, tTo, num_armies)
-        else:
-            self.end_turn()
-
-
-
-
-    def refresh_state(self):
+    def _refresh_state(self):
         self.game_state = self.get_game_state()
         self.player_status = self.get_player_status()
         self.player_status_lite = self.get_player_status(True)
 
-    def err(msg):
+    def _err(self, msg):
         print msg
         print "Current game state:"
         pp(self.game_state)
@@ -140,11 +114,108 @@ class AIBase(Brisk.Brisk):
         pp(self.player_status)
         sys.exit(1)
 
+
+
+    # Core AI execution methods
+
+    def __init__(self):
+        super(AIBase, self).__init__()
+        self.map_layout = self.get_map_layout()
+        self._refresh_state()
+        self._generate_continent_ratings()
+
+    def do_reinforce(self):
+        num_reserves = self.player_status['num_reserves']
+        reinforcements = self.reinforce(num_reserves)
+
+        # TODO handle error when placing in enemy territory
+        invalid_ids = filter(lambda tid: get_territory_by_id(tid,self.player_status['territories']) == None, reinforcements.keys())
+        if invalid_ids:
+            self._err(ReinforceError.TERRITORY_NOT_OWNED(invalid_ids))
+
+        num_deployed = sum(reinforcements.values())
+        # All troops must be deployed
+        if (num_deployed < num_reserves):
+            self._err(ReinforceError.LEFTOVER_ARMY)
+        # Cannot deploy too many troops
+        elif (num_deployed > num_reserves):
+            self._err(ReinforceError.TOO_MUCH_ARMY)
+
+        # Execute reinforcement
+        for territoryId, num_troops in reinforcements.iteritems():
+            self.place_armies(territoryId, num_troops)
+
+
+    def do_battle(self):
+        ''' Returns True when done, false otherwise '''
+        legal_attacks = self._create_set_of_legal_battles()
+        attacks = self.battle(legal_attacks)
+
+        if attacks:
+            tattack, tdefend, num_armies = attacks
+            if ((tattack, tdefend) not in legal_attacks):
+                self._err(AttackError.ILLEGAL_ATTACK(tattack, tdefend))
+            else:
+                t = get_territory_by_id(tattack, self.player_status['territories'])
+                # There must be enough troops to attack
+                if num_armies > t.num_armies - 1:
+                    self._err(AttackError.NOT_ENOUGH_ARMY(tattack, tdefend, num_armies))
+                # There can't be more than 3 troops attacking
+                elif num_armies > 3:
+                    self._err(AttackError.TOO_MUCH_ARMY(tattack, tdefend, num_armies))
+                else:
+                    # Everything is valid
+                    self.attack(tattack, tdefend, num_armies)
+            return False
+        else:
+            return True
+        
+
+    def do_fortify(self):
+        legal_forts = self._create_set_of_legal_fortifications()
+        fortification = self.fortify(legal_forts)
+
+        if fortification:
+            tfrom, tto, num_armies = fortification
+            # Fortification must occur between adjacent territories
+            if (tfrom, tto) not in legal_forts:
+                self._err(FortifyError.ILLEGAL_FORTIFY(tfrom, tto))
+            else:
+                t = get_territory_by_id(tfrom, self.player_status['territories'])
+                # There must be enough troops to move
+                if num_armies > t.num_armies - 1:
+                    self._err(FortifyError.NOT_ENOUGH_ARMY(tfrom, tto, num_armies))
+                else:
+                    # Everything is valid
+                    self.transfer_armies(tfrom, tto, num_armies)
+        else:
+            self.end_turn()
+
     def run(self):
-        print self.game.game_id
-        # refresh state
-        # do reinforce
-        # refresh state
-        # do attack
-        # refresh state
-        # do fortify
+        print "Game ID: %d" % self.game_id
+
+        while not self.game_state['winner']:
+
+            if self.player_status['current_turn']:
+                print "New turn"
+
+                print "Reinforcing..."
+                self._refresh_state()
+                self.do_reinforce()
+
+                print "Attacking..."
+                done = False
+                while not done:
+                    self._refresh_state()
+                    done = self.do_battle()
+
+                print "Fortifying..."
+                # refresh state
+                self._refresh_state()
+                self.do_fortify()
+
+                print "End turn!\n"
+
+            self._refresh_state()
+            time.sleep(config.POLL_TIME)
+
