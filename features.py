@@ -1,10 +1,22 @@
 import time
+from utils import get_territory_by_id
     
 # 4.5.1
 def armies_feature(map_layout, player_status, enemy_status):
     return float(player_status['num_armies']) / (player_status['num_armies'] + enemy_status['num_armies'])
 
 # TODO: 4.5.2 - 4.5.5
+
+# assumes t_id in player territories
+def _threat(t_id, map_layout, player_status, enemy_status):
+    bst = 0
+    enemy_territory_ids = [t['territory'] for t in enemy_status['territories']]
+    player_territory_ids = [t['territory'] for t in player_status['territories']]
+    for adjacent_id in get_territory_by_id(t_id, map_layout['territories'])['adjacent_territories']:
+        if adjacent_id in enemy_territory_ids:
+            bst += get_territory_by_id(adjacent_id, enemy_status['territories'])['num_armies']
+    bsr = float(bst) / get_territory_by_id(t_id, player_status['territories'])['num_armies']
+    return bsr
 
 # 4.5.6
 def enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status):
@@ -112,8 +124,8 @@ if __name__ == "__main__":
     map_layout = b.get_map_layout()
     player_status = b.get_player_status()
     enemy_status = b.get_enemy_status()
-    from utils import wrapper
-    wrapped = wrapper(evaluate, b.map_layout, b.player_status, b.get_enemy_status())
-    import timeit
-    print "Evaluate (s): " + str(timeit.Timer(wrapped).timeit(number=100)/100)
+    # from utils import wrapper
+    # wrapped = wrapper(evaluate, b.map_layout, b.player_status, b.get_enemy_status())
+    # import timeit
+    # print "Evaluate (s): " + str(timeit.Timer(wrapped).timeit(number=100)/100)
         

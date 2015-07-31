@@ -63,6 +63,8 @@ class Brisk(object):
 
     def get_enemy_status(self):
         players = self.get_players_status()['players']
+        if len(players) == 1:
+            return None
         enemy_id = players[0]['player'] if players[0]['player'] is not self.player_id else players[1]['player']
         return self.get(self.url_game() + "/player/" + str(enemy_id))
 

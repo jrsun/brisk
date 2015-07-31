@@ -94,6 +94,7 @@ class AIBase(Brisk.Brisk):
         self.game_state = self.get_game_state()
         self.player_status = self.get_player_status()
         self.player_status_lite = self.get_player_status(True)
+        self.enemy_status = self.get_enemy_status()
 
     def _err(self, msg):
         print "Current game state:"
