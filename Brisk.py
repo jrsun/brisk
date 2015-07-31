@@ -3,7 +3,7 @@ import urllib2
 
 class Brisk(object):
     HOST = 'http://www.briskchallenge.com'
-    TEAM_NAME = 'YOUR_TEAM_NAME_HERE'
+    TEAM_NAME = 'BogoBot'
 
     def __init__(self, game_id=False, bot_id=1):
         res = self.join_game(game_id, bot_id)
@@ -63,7 +63,7 @@ class Brisk(object):
 
     def get_enemy_status(self):
         players = self.get_players_status()['players']
-        if len(players) == 1:
+        if not players or len(players) == 1:
             return None
         enemy_id = players[0]['player'] if players[0]['player'] is not self.player_id else players[1]['player']
         return self.get(self.url_game() + "/player/" + str(enemy_id))

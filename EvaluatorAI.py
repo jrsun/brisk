@@ -46,7 +46,7 @@ class EvaluatorAI(AIBase.AIBase):
 
     def _choose_best_battle(self, legal_territories_to_attack):
         score = {}
-        curr_score = features.evaluate(self.map_layout, self.player_status, self.enemy_status)
+        curr_score = features.evaluate_battle(self.map_layout, self.player_status, self.enemy_status)
         for (src, dest) in legal_territories_to_attack:
             battle = (src, dest)
             # score[random.random()] = battle
@@ -57,7 +57,10 @@ class EvaluatorAI(AIBase.AIBase):
         return score[max(score)]
 
     def fortify(self, legal_territories_to_fortify):
-        f, t, n = self._choose_best_fortify(legal_territories_to_fortify)
+        best_fortify = self._choose_best_fortify(legal_territories_to_fortify)
+        if not best_fortify:
+            return None
+        f, t, n = best_fortify
         return (f['territory'], t['territory'], n)
         ''' Returns (from_territory, to_territory, num_armies_to_move), or a None value if ending turn '''
 

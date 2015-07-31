@@ -169,7 +169,6 @@ class AIBase(Brisk.Brisk):
         if fortification:
             tfrom, tto, num_armies = fortification
             legal_forts_to_ids = map(lambda (f,t): (f['territory'], t['territory']), legal_forts)
-            print legal_forts_to_ids
             # Fortification must occur between adjacent territories
             if (tfrom, tto) not in legal_forts_to_ids:
                 self._err(FortifyError.ILLEGAL_FORTIFY(tfrom, tto))
@@ -216,5 +215,6 @@ class AIBase(Brisk.Brisk):
                 print "End turn!\n"
 
             time.sleep(config.POLL_TIME)
+            print "Current turn: " + str(self.player_status['current_turn'])
             self._refresh_state()
 
