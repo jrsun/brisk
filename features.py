@@ -239,7 +239,8 @@ def evaluate_battle(map_layout, player_status, enemy_status): # 0.0001
     g * 1 * -0.1 + \
     h * 1 * 50 + \
     i * 0.05 * 1 + \
-    j * 0.2 * 1
+    j * 0.2 * 1 + \
+    k * 1 * 1
 
 def evaluate_fortify(map_layout, player_status, enemy_status): # 0.0001
     # armies feature is constant
