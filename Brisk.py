@@ -1,5 +1,5 @@
 import json
-import urllib2
+import urllib2, time
 
 class Brisk(object):
     HOST = 'http://www.briskchallenge.com'
