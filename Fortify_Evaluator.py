@@ -17,7 +17,7 @@ class Fortify_Evaluator():
         sim_player_status = copy.deepcopy(player_status)
         sim_source = get_territory_by_id(source['territory'], sim_player_status['territories'])
         sim_source['num_armies'] -= num_armies
-        sim_dest = get_territory_by_id(dest['territory'], sim_player_status['territories'])
+        sim_dest = get_territory_by_id(destination['territory'], sim_player_status['territories'])
         sim_dest['num_armies'] += num_armies
         return (sim_player_status, enemy_status)
 
