@@ -13,7 +13,7 @@ class Battle_Evaluator():
     # evaluate_action takes expected value
     def evaluate_action(self, action, map_layout, player_status, enemy_status): # 0.0005
         simulated_outcomes = self._simulate(action, player_status, enemy_status)
-        return sum([prob*features.evaluate(map_layout, sim['player_status'], sim['enemy_status']) for (prob, sim) in simulated_outcomes.iteritems()])
+        return sum([prob*features.evaluate_battle(map_layout, sim['player_status'], sim['enemy_status']) for (prob, sim) in simulated_outcomes.iteritems()])
         
     def _simulate(self, action, player_status, enemy_status): # 0.0004
         # outcomes = {prob: game_state}

@@ -10,7 +10,7 @@ class Reinforcement_Evaluator():
     # action = territory object
     def evaluate_action(self, action, map_layout, player_status, enemy_status): # 0.0005
         (sim_player_status, sim_enemy_status) = self._simulate(action, player_status, enemy_status)
-        return features.evaluate(map_layout, sim_player_status, sim_enemy_status)
+        return features.evaluate_reinforce(map_layout, sim_player_status, sim_enemy_status)
 
     def _simulate(self, action, player_status, enemy_status): # 0.0004
         sim_player_status = copy.deepcopy(player_status) # 0.00035

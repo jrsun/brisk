@@ -46,7 +46,7 @@ class EvaluatorAI(AIBase.AIBase):
 
     def _choose_best_battle(self, legal_territories_to_attack):
         score = {}
-        curr_score = features.evaluate(self.map_layout, self.player_status, self.enemy_status)
+        curr_score = features.evaluate_battle(self.map_layout, self.player_status, self.enemy_status)
         for (src, dest) in legal_territories_to_attack:
             battle = (src, dest)
             # score[random.random()] = battle
