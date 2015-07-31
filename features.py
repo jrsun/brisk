@@ -159,7 +159,7 @@ def partial_continent_score_feature(map_layout, player_status, enemy_status):
         for t_id in c['territories']:
             if t_id in player_territory_ids:
                 we_have += 1
-        partial_continent_score += float(we_have) / len(c['territories']) * c['rating']
+        partial_continent_score += ((float(we_have) / len(c['territories'])) ** 2) * c['rating']
     return partial_continent_score
 
     # # Debug only
