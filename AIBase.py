@@ -7,24 +7,28 @@ class ReinforceError(object):
     _prefix = "ReinforceError: "
     LEFTOVER_ARMY = _prefix + "You did not deploy all of your troops."
     TOO_MUCH_ARMY = _prefix + "You deployed more troops than you have."
+    @staticmethod
     def TERRITORY_NOT_OWNED(territoryIds):
-        return "%sYou don't own the following territories: %s" % (_prefix, str(territoryIds))
+        return "ReinforceError: You don't own the following territories: %s" % str(territoryIds)
 
 class AttackError(object):
-    _prefix = "AttackError: "
+    @staticmethod
     def ILLEGAL_ATTACK(tattack, tdefend):
-        return "%sCannot attack %d from %d: they are not adjacent, or you do not own the attacking territory." % (_prefix, tdefend, tattack)
+        return "AttackError: Cannot attack %d from %d: they are not adjacent, or you do not own the attacking territory." % ( tdefend, tattack)
+    @staticmethod
     def NOT_ENOUGH_ARMY(tattack, tdefend, num_armies):
-        return "%sCannot attack %d from %d: less than %d armies to move." % (_prefix, tdefend, tattack, num_armies)
+        return "AttackError: Cannot attack %d from %d: less than %d armies to move." % (tdefend, tattack, num_armies)
+    @staticmethod
     def TOO_MUCH_ARMY(tattack, tdefend, num_armies):
-        return "%sCannot attack %d from %d with %d armies: cannot attack with more than 3 armies" % (_prefix, tdefend, tattack, num_armies)
+        return "AttackError: Cannot attack %d from %d with %d armies: cannot attack with more than 3 armies" % (tdefend, tattack, num_armies)
 
 class FortifyError(object):
-    _prefix = "FortifyError: "
+    @staticmethod
     def ILLEGAL_FORTIFY(tfrom, tto):
-        return "%sCannot fortify from %d to %d: they are not adjacent, or you do not own at least one of the territories." % (_prefix, tfrom, tto)
+        return "FortifyError: Cannot fortify from %d to %d: they are not adjacent, or you do not own at least one of the territories." % (tfrom, tto)
+    @staticmethod
     def NOT_ENOUGH_ARMY(tfrom, tto, num_armies):
-        return "%sCannot fortify from %d to %d: less than %d armies to move." % (_prefix, tfrom, tto, num_armies)
+        return "FortifyError: Cannot fortify from %d to %d: less than %d armies to move." % (tfrom, tto, num_armies)
 
 
 
@@ -32,7 +36,7 @@ class FortifyError(object):
 
 def pp(jsonObject):
     ''' Pretty prints json '''
-    json.dumps(jsonObject, indent=4)
+    print json.dumps(jsonObject, indent=4)
 
 # Could optimize this
 def get_territory_by_id(tid, territories):
@@ -148,17 +152,18 @@ class AIBase(Brisk.Brisk):
 
     def do_battle(self):
         ''' Returns True when done, false otherwise '''
-        legal_attacks = self._create_set_of_legal_battles()
-        attacks = self.battle(legal_attacks)
+        legal_battles = self._create_set_of_legal_battles()
+        attacks = self.battle(legal_battles)
 
         if attacks:
             tattack, tdefend, num_armies = attacks
-            if ((tattack, tdefend) not in legal_attacks):
+            legal_battles_to_ids = map(lambda (a,d): (a['territory'], d['territory']), legal_battles)
+            if ((tattack, tdefend) not in legal_battles_to_ids):
                 self._err(AttackError.ILLEGAL_ATTACK(tattack, tdefend))
             else:
                 t = get_territory_by_id(tattack, self.player_status['territories'])
                 # There must be enough troops to attack
-                if num_armies > t.num_armies - 1:
+                if num_armies > t['num_armies'] - 1:
                     self._err(AttackError.NOT_ENOUGH_ARMY(tattack, tdefend, num_armies))
                 # There can't be more than 3 troops attacking
                 elif num_armies > 3:
@@ -177,13 +182,14 @@ class AIBase(Brisk.Brisk):
 
         if fortification:
             tfrom, tto, num_armies = fortification
+            legal_forts_to_ids = map(lambda (f,t): (f['territory'], t['territory']), legal_forts)
             # Fortification must occur between adjacent territories
-            if (tfrom, tto) not in legal_forts:
+            if (tfrom, tto) not in legal_forts_to_ids:
                 self._err(FortifyError.ILLEGAL_FORTIFY(tfrom, tto))
             else:
                 t = get_territory_by_id(tfrom, self.player_status['territories'])
                 # There must be enough troops to move
-                if num_armies > t.num_armies - 1:
+                if num_armies > t['num_armies'] - 1:
                     self._err(FortifyError.NOT_ENOUGH_ARMY(tfrom, tto, num_armies))
                 else:
                     # Everything is valid
