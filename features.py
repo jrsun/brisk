@@ -151,6 +151,17 @@ def own_occupied_continents_feature(map_layout, player_status, enemy_status):
             player_occupied_continents += 1
     return player_occupied_continents
 
+def partial_continent_score_feature(map_layout, player_status, enemy_status):
+    partial_continent_score = 0
+    player_territory_ids = [t['territory'] for t in player_status['territories']]
+    for c in map_layout['continents']:
+        we_have = 0
+        for t_id in c['territories']:
+            if t_id in player_territory_ids:
+                we_have += 1
+        partial_continent_score += float(we_have) / len(c['territories']) * c['rating']
+    return partial_continent_score
+
     # # Debug only
     # if debug:
     #     print "Enemy Reinf: " + str(timeit.timeit(enemy_expected_reinforcements_feature, number=10))
