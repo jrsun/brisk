@@ -189,10 +189,10 @@ def partial_continent_score_feature(map_layout, player_status, enemy_status):
 def evaluate_reinforce(map_layout, player_status, enemy_status): # 0.0001
     # armies_feature is constant
     # return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
-    return continent_safety_feature(map_layout, player_status, enemy_status) * -0.5 + \
+    return continent_safety_feature(map_layout, player_status, enemy_status) * -20 + \
         continent_threat_feature(map_layout, player_status, enemy_status) * 1 + \
         enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
-        distance_to_frontier_feature(map_layout, player_status, enemy_status) * 5
+        distance_to_frontier_feature(map_layout, player_status, enemy_status) * 10
         # more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.05
 
 def evaluate_battle(map_layout, player_status, enemy_status): # 0.0001
@@ -232,15 +232,15 @@ def evaluate_battle(map_layout, player_status, enemy_status): # 0.0001
     #     j * 0.2 * 0.5
     # Aggressive conquest, with focus on continent protection
     return a * 1 * 0.1 + \
-    b * 0.2 * -10 + \
+    b * 0.2 * -50 + \
     c * 0.05 * 0.1 + \
     d * 0.02 * -0.1 + \
     e * 0.1 * -0.1 + \
     f * 0.033 * 0.1 + \
     g * 1 * -0.1 + \
     h * 1 * 50 + \
-    i * 0.05 * 1 + \
-    j * 0.2 * 1 + \
+    i * 0.05 * 20 + \
+    j * 0.2 * 20 + \
     k * 1 * 1
 
 def evaluate_fortify(map_layout, player_status, enemy_status): # 0.0001
@@ -250,7 +250,7 @@ def evaluate_fortify(map_layout, player_status, enemy_status): # 0.0001
         continent_threat_feature(map_layout, player_status, enemy_status) * 1 + \
         enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
         more_than_one_army_feature(map_layout, player_status, enemy_status) * 0.1 + \
-        distance_to_frontier_feature(map_layout, player_status, enemy_status) * 7
+        distance_to_frontier_feature(map_layout, player_status, enemy_status) * 50
 
 if __name__ == "__main__":
     import AIBase
