@@ -1,32 +1,32 @@
-import AIBase
+import AIBase, utils
 import time
 
 class MovingTankAI(AIBase.AIBase):
 
     def __init__(self):
         super(MovingTankAI, self).__init__()
-        self.tank_territory = None # Territory object
-        self.target = None # Territory object
+        self.tank_territory_id = None # Territory ID
+        self.target_id = None # Territory ID
 
 
 
     def reinforce(self, num_reserves):
         ''' Returns {<territoryId>: <num troops deployed>} '''
-        if self.tank_territory == None or get_territory_by_id(tank_territory['territory'], self.player_status['territories']) == None:
-            self.tank_territory = self.player_status['territories'][0]
-        return { self.tank_territory['territory']: num_reserves }
+        if self.tank_territory_id == None or utils.get_territory_by_id(self.tank_territory_id, self.player_status['territories']) == None:
+            self.tank_territory_id = self.player_status['territories'][0]['territory']
+        return { self.tank_territory_id: num_reserves }
         
 
 
     def battle(self, legal_territories_to_attack):
         ''' Returns (attack, defend, num_armies_to_attack), or a None value if not attacking '''
 
-        targets = filter(lambda (attack,defend): attack['territory'] == self.tank_territory['territory'], legal_territories_to_attack)
+        targets = filter(lambda (attack,defend): attack['territory'] == self.tank_territory_id, legal_territories_to_attack)
 
         if targets:
 
             attack, defend = targets[0]
-            self.target = defend
+            self.target_id = defend['territory']
             army_count = attack['num_armies']
 
             if (army_count == 1):
@@ -42,25 +42,20 @@ class MovingTankAI(AIBase.AIBase):
     def fortify(self, legal_territories_to_fortify):
         ''' Returns (from_territory, to_territory, num_armies_to_move), or a None value if ending turn '''
 
-        start = time.time()
+        if self.target_id:
 
-        if self.target:
-
-            conqueredTerritory = AIBase.get_territory_by_id(self.target['territory'], self.player_status['territories'])
+            conqueredTerritory = utils.get_territory_by_id(self.target_id, self.player_status['territories'])
 
             if conqueredTerritory:
 
-                tmp = self.tank_territory
-                self.tank_territory = self.target
+                tmp_id = self.tank_territory_id
+                self.tank_territory_id = self.target_id
+                source = utils.get_territory_by_id(tmp_id, self.player_status['territories'])
 
-                num_armies = tmp['num_armies']
+                num_armies = source['num_armies']
                 if num_armies > 1:
+                    return (tmp_id, self.target_id, num_armies - 1)
 
-                    print time.time() - start
-
-                    return (tmp['territory'], self.target['territory'], num_armies - 1)
-
-        print "Failed; %d" % (time.time() - start)
         return None
 
 if __name__ == '__main__':

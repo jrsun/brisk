@@ -1,4 +1,4 @@
-import Brisk, config
+import Brisk, config, utils
 import sys, time, json
 
 # Error codes
@@ -25,25 +25,10 @@ class AttackError(object):
 class FortifyError(object):
     @staticmethod
     def ILLEGAL_FORTIFY(tfrom, tto):
-        return "FortifyError: Cannot fortify from %d to %d: they are not adjacent, or you do not own at least one of the territories." % (tfrom, tto)
+        return "FortifyError: Cannot fortify from %d to %d: they are not adjacent, you do not own at least one of the territories, or you have only 1 troop in the source territory." % (tfrom, tto)
     @staticmethod
     def NOT_ENOUGH_ARMY(tfrom, tto, num_armies):
         return "FortifyError: Cannot fortify from %d to %d: less than %d armies to move." % (tfrom, tto, num_armies)
-
-
-
-# Public standalone utilities
-
-def pp(jsonObject):
-    ''' Pretty prints json '''
-    print json.dumps(jsonObject, indent=4)
-
-# Could optimize this
-def get_territory_by_id(tid, territories):
-    for t in territories:
-        if t['territory'] == tid:
-            return t
-    return None
 
 
 
@@ -112,9 +97,9 @@ class AIBase(Brisk.Brisk):
 
     def _err(self, msg):
         print "Current game state:"
-        pp(self.game_state)
+        utils.pp(self.game_state)
         print "\nCurrent player status:"
-        pp(self.player_status)
+        utils.pp(self.player_status)
         print msg
         sys.exit(1)
 
@@ -133,7 +118,7 @@ class AIBase(Brisk.Brisk):
         reinforcements = self.reinforce(num_reserves)
 
         # TODO handle error when placing in enemy territory
-        invalid_ids = filter(lambda t_id: get_territory_by_id(t_id,self.player_status['territories']) == None, reinforcements.keys())
+        invalid_ids = filter(lambda t_id: utils.get_territory_by_id(t_id,self.player_status['territories']) == None, reinforcements.keys())
         if invalid_ids:
             self._err(ReinforceError.TERRITORY_NOT_OWNED(invalid_ids))
 
@@ -161,7 +146,7 @@ class AIBase(Brisk.Brisk):
             if ((tattack, tdefend) not in legal_battles_to_ids):
                 self._err(AttackError.ILLEGAL_ATTACK(tattack, tdefend))
             else:
-                t = get_territory_by_id(tattack, self.player_status['territories'])
+                t = utils.get_territory_by_id(tattack, self.player_status['territories'])
                 # There must be enough troops to attack
                 if num_armies > t['num_armies'] - 1:
                     self._err(AttackError.NOT_ENOUGH_ARMY(tattack, tdefend, num_armies))
@@ -188,7 +173,7 @@ class AIBase(Brisk.Brisk):
             if (tfrom, tto) not in legal_forts_to_ids:
                 self._err(FortifyError.ILLEGAL_FORTIFY(tfrom, tto))
             else:
-                t = get_territory_by_id(tfrom, self.player_status['territories'])
+                t = utils.get_territory_by_id(tfrom, self.player_status['territories'])
                 # There must be enough troops to move
                 if num_armies > t['num_armies'] - 1:
                     self._err(FortifyError.NOT_ENOUGH_ARMY(tfrom, tto, num_armies))
@@ -208,6 +193,12 @@ class AIBase(Brisk.Brisk):
 
                 print "Reinforcing..."
                 self._refresh_state()
+                # Handles the possibility that previous fortify has not ended the turn right away.
+                if self.player_status['num_reserves'] == 0:
+                    print "num_reserves is 0, retrying...\n"
+                    time.sleep(config.POLL_TIME)
+                    self._refresh_state()
+                    continue # Redo all the initial checks of the loop
                 self.do_reinforce()
 
                 print "Attacking..."
@@ -223,6 +214,6 @@ class AIBase(Brisk.Brisk):
 
                 print "End turn!\n"
 
-            self._refresh_state()
             time.sleep(config.POLL_TIME)
+            self._refresh_state()
 
