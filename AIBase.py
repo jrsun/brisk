@@ -91,10 +91,18 @@ class AIBase(Brisk.Brisk):
             continent['rating'] = float(15 + continent['continent_bonus'] - 4 * len(continent['border_territories'])) / len(continent['territories'])
 
     def _refresh_state(self):
+        start = time.time()
         self.game_state = self.get_game_state()
+        # print "refreshed game state in %f seconds" % (time.time() - start)
+        start = time.time()
         self.player_status = self.get_player_status()
+        # print "refreshed player status in %f seconds" % (time.time() - start)
+        start = time.time()
         self.player_status_lite = self.get_player_status(True)
+        # print "refreshed player status lite in %f seconds" % (time.time() - start)
+        start = time.time()
         self.enemy_status = self.get_enemy_status()
+        # print "refreshed enemy status in %f seconds" % (time.time() - start)
 
     def _err(self, msg):
         print "Current game state:"
@@ -200,21 +208,23 @@ class AIBase(Brisk.Brisk):
                 #     self._refresh_state()
                 #     continue # Redo all the initial checks of the loop
                 self.do_reinforce()
+                time.sleep(config.DELAY_BETWEEN_ACTIONS)
 
                 print "Attacking..."
                 done = False
                 while not done:
                     self._refresh_state()
                     done = self.do_battle()
+                    time.sleep(config.DELAY_BETWEEN_ACTIONS)
 
                 print "Fortifying..."
                 # refresh state
                 self._refresh_state()
                 self.do_fortify()
+                time.sleep(config.DELAY_BETWEEN_ACTIONS)
 
                 print "End turn!\n"
 
             time.sleep(config.POLL_TIME)
-            print "Current turn: " + str(self.player_status['current_turn'])
             self._refresh_state()
 

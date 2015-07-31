@@ -155,32 +155,32 @@ def own_occupied_continents_feature(map_layout, player_status, enemy_status):
 def evaluate_reinforce(map_layout, player_status, enemy_status): # 0.0001
     # armies_feature is constant
     # more_than_one_army_feature is constant
-    return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
-        continent_safety_feature(map_layout, player_status, enemy_status) * -0.5 + \
+    # return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
+    return continent_safety_feature(map_layout, player_status, enemy_status) * -0.5 + \
         continent_threat_feature(map_layout, player_status, enemy_status) * 0.05 + \
-        enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
-        more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.1
+        enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3
+        # more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.1
 
 def evaluate_battle(map_layout, player_status, enemy_status): # 0.0001
     return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
         continent_safety_feature(map_layout, player_status, enemy_status) * -0.01 + \
         continent_threat_feature(map_layout, player_status, enemy_status) * 0.05 + \
         enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
-        enemy_occupied_continents_feature(map_layout, player_status, enemy_status) * -0.3 + \
-        hinterland_feature(map_layout, player_status, enemy_status) * 0.3 + \
+        enemy_occupied_continents_feature(map_layout, player_status, enemy_status) * -0.5 + \
+        hinterland_feature(map_layout, player_status, enemy_status) * 0.1 + \
         more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.1 + \
-        occupied_territories_feature(map_layout, player_status, enemy_status) * 0.2 + \
+        occupied_territories_feature(map_layout, player_status, enemy_status) * 0.7 + \
         our_expected_reinforcements_feature(map_layout, player_status, enemy_status) * 0.2 + \
-        own_occupied_continents_feature(map_layout, player_status, enemy_status) * 0.1
+        own_occupied_continents_feature(map_layout, player_status, enemy_status) * 0.7
 
 def evaluate_fortify(map_layout, player_status, enemy_status): # 0.0001
     # armies feature is constant
     # more_than_one_army_feature is constant
-    return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
-        continent_safety_feature(map_layout, player_status, enemy_status) * -0.01 + \
+    # return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
+    return continent_safety_feature(map_layout, player_status, enemy_status) * -0.3 + \
         continent_threat_feature(map_layout, player_status, enemy_status) * 0.05 + \
-        enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
-        more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.1
+        enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3
+        # more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.1
 
 if __name__ == "__main__":
     import AIBase
