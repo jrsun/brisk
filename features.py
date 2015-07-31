@@ -179,7 +179,8 @@ def evaluate_reinforce(map_layout, player_status, enemy_status): # 0.0001
     # return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
     return continent_safety_feature(map_layout, player_status, enemy_status) * -0.5 + \
         continent_threat_feature(map_layout, player_status, enemy_status) * 0.05 + \
-        enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3
+        enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
+        distance_to_frontier_feature(map_layout, player_status, enemy_status) * 5
         # more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.05
 
 def evaluate_battle(map_layout, player_status, enemy_status): # 0.0001
@@ -200,7 +201,8 @@ def evaluate_fortify(map_layout, player_status, enemy_status): # 0.0001
     return continent_safety_feature(map_layout, player_status, enemy_status) * -0.3 + \
         continent_threat_feature(map_layout, player_status, enemy_status) * 0.05 + \
         enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
-        more_than_one_army_feature(map_layout, player_status, enemy_status) * 0.1
+        more_than_one_army_feature(map_layout, player_status, enemy_status) * 0.1 + \
+        distance_to_frontier_feature(map_layout, player_status, enemy_status) * 5
 
 if __name__ == "__main__":
     import AIBase
