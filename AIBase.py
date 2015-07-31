@@ -1,5 +1,7 @@
 import Brisk, config, utils
 import sys, time, json
+import Fortify_Evaluator
+import features
 
 # Error codes
 
@@ -121,6 +123,7 @@ class AIBase(Brisk.Brisk):
         self.map_layout = self.get_map_layout()
         self._refresh_state()
         self._generate_continent_ratings()
+        self.fe = Fortify_Evaluator.Fortify_Evaluator()
 
     def do_reinforce(self):
         num_reserves = self.player_status['num_reserves']
@@ -165,6 +168,18 @@ class AIBase(Brisk.Brisk):
                 else:
                     # Everything is valid
                     self.attack(tattack, tdefend, num_armies)
+                    time.sleep(config.DELAY_BETWEEN_ACTIONS)
+                    self._refresh_state()
+                    if utils.get_territory_by_id(tdefend, self.player_status['territories']):
+                        print "Conquered"
+                        attack_move = (utils.get_territory_by_id(tattack, self.player_status['territories']), \
+                            utils.get_territory_by_id(tdefend, self.player_status['territories']), \
+                            utils.get_territory_by_id(tattack, self.player_status['territories'])['num_armies'] - 1)
+                        sim_score = self.fe.evaluate_action(attack_move, self.map_layout, self.player_status, self.enemy_status)
+                        score = features.evaluate_fortify(self.map_layout, self.player_status, self.enemy_status)
+                        if sim_score > score:
+                            print "ATTACK MOVE!"
+                            self.transfer_armies(tattack, tdefend, utils.get_territory_by_id(tattack, self.player_status['territories'])['num_armies'] - 1)      
             return False
         else:
             return True

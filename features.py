@@ -207,18 +207,18 @@ def evaluate_battle(map_layout, player_status, enemy_status): # 0.0001
     i = our_expected_reinforcements_feature(map_layout, player_status, enemy_status)
     j = own_occupied_continents_feature(map_layout, player_status, enemy_status)
     k = partial_continent_score_feature(map_layout, player_status, enemy_status)
-    print "armies feature: %f" % a
-    print "continent safety feature: %f" % b
-    print "continent threat feature: %f" % c
-    print "enemy expected reinforcements feature: %f" % d
-    print "enemy occupied continents feature: %f" % e
-    print "hinterland feature: %f" % f
-    print "more than one army feature: %f" % g
-    print "occupied territories feature: %f" % h
-    print "our expected reinforcements feature: %f" % i
-    print "own occupied continents feature: %f" % j
-    print "partial continent score feature: %f" % k
-    print "\n"
+    # print "armies feature: %f" % a
+    # print "continent safety feature: %f" % b
+    # print "continent threat feature: %f" % c
+    # print "enemy expected reinforcements feature: %f" % d
+    # print "enemy occupied continents feature: %f" % e
+    # print "hinterland feature: %f" % f
+    # print "more than one army feature: %f" % g
+    # print "occupied territories feature: %f" % h
+    # print "our expected reinforcements feature: %f" % i
+    # print "own occupied continents feature: %f" % j
+    # print "partial continent score feature: %f" % k
+    # print "\n"
     # Continent first strategy
     # return a * 1 * 0.05 + \
     #     b * 0.2 * -0.1 + \
@@ -238,7 +238,7 @@ def evaluate_battle(map_layout, player_status, enemy_status): # 0.0001
     e * 0.1 * -0.1 + \
     f * 0.033 * 0.1 + \
     g * 1 * -0.1 + \
-    h * 1 * 50 + \
+    h * 1 * 20 + \
     i * 0.05 * 20 + \
     j * 0.2 * 20 + \
     k * 1 * 20
