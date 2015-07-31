@@ -12,7 +12,7 @@ class MovingTankAI(AIBase.AIBase):
 
     def reinforce(self, num_reserves):
         ''' Returns {<territoryId>: <num troops deployed>} '''
-        if self.tank_territory == None:
+        if self.tank_territory == None or get_territory_by_id(tank_territory['territory'], self.player_status['territories']) == None:
             self.tank_territory = self.player_status['territories'][0]
         return { self.tank_territory['territory']: num_reserves }
         
