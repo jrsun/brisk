@@ -118,7 +118,7 @@ class AIBase(Brisk.Brisk):
         reinforcements = self.reinforce(num_reserves)
 
         # TODO handle error when placing in enemy territory
-        invalid_ids = filter(lambda tid: utils.get_territory_by_id(tid,self.player_status['territories']) == None, reinforcements.keys())
+        invalid_ids = filter(lambda t_id: utils.get_territory_by_id(t_id,self.player_status['territories']) == None, reinforcements.keys())
         if invalid_ids:
             self._err(ReinforceError.TERRITORY_NOT_OWNED(invalid_ids))
 
@@ -131,8 +131,8 @@ class AIBase(Brisk.Brisk):
             self._err(ReinforceError.TOO_MUCH_ARMY)
 
         # Execute reinforcement
-        for territoryId, num_troops in reinforcements.iteritems():
-            self.place_armies(territoryId, num_troops)
+        for t_id, num_troops in reinforcements.iteritems():
+            self.place_armies(t_id, num_troops)
 
 
     def do_battle(self):
