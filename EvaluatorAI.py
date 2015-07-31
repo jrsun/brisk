@@ -3,7 +3,7 @@ import Reinforcement_Evaluator
 import Battle_Evaluator
 import Fortify_Evaluator
 #debug
-import random
+import features
 
 class EvaluatorAI(AIBase.AIBase):
 
@@ -12,6 +12,7 @@ class EvaluatorAI(AIBase.AIBase):
         self.re = Reinforcement_Evaluator.Reinforcement_Evaluator()
         self.be = Battle_Evaluator.Battle_Evaluator()
         self.fe = Fortify_Evaluator.Fortify_Evaluator()
+        self.current_battle = None
 
     # what if there is no legal move?
 
@@ -36,17 +37,24 @@ class EvaluatorAI(AIBase.AIBase):
 
     def battle(self, legal_territories_to_attack):
         ''' Returns (attack, defend, num_armies_to_attack), or a None value if not attacking '''
-        print len(legal_territories_to_attack)
-        f, t, n = self._choose_best_battle(legal_territories_to_attack)
+        best_battle = self._choose_best_battle(legal_territories_to_attack)
+        if not best_battle:
+            return None
+        f, t = best_battle
+        n = min(f['num_armies'] - 1, 3)
         return (f['territory'], t['territory'], n)
 
     def _choose_best_battle(self, legal_territories_to_attack):
         score = {}
+        curr_score = features.evaluate(self.map_layout, self.player_status, self.enemy_status)
         for (src, dest) in legal_territories_to_attack:
-            battle = (src, dest, min(3, src['num_armies'] - 1))
-            score[random.random()] = battle
-            # score[self.be.evaluate_action(attack, self.map_layout, self.player_status, self.enemy_status)] = battle
-        return score[max(score)] if len(score) > 0 else None
+            battle = (src, dest)
+            # score[random.random()] = battle
+            score[self.be.evaluate_action(battle, self.map_layout, self.player_status, self.enemy_status)] = battle
+        if len(score) == 0 or max(score) - curr_score <= 0.5:
+            return None
+        print max(score) - curr_score
+        return score[max(score)]
 
     def fortify(self, legal_territories_to_fortify):
         f, t, n = self._choose_best_fortify(legal_territories_to_fortify)

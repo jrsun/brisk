@@ -139,10 +139,10 @@ class AIBase(Brisk.Brisk):
     def do_battle(self):
         ''' Returns True when done, false otherwise '''
         legal_battles = self._create_set_of_legal_battles()
-        attacks = self.battle(legal_battles)
+        battle = self.battle(legal_battles)
 
-        if attacks:
-            tattack, tdefend, num_armies = attacks
+        if battle:
+            tattack, tdefend, num_armies = battle
             legal_battles_to_ids = map(lambda (a,d): (a['territory'], d['territory']), legal_battles)
             if ((tattack, tdefend) not in legal_battles_to_ids):
                 self._err(AttackError.ILLEGAL_ATTACK(tattack, tdefend))
@@ -195,11 +195,11 @@ class AIBase(Brisk.Brisk):
                 print "Reinforcing..."
                 self._refresh_state()
                 # Handles the possibility that previous fortify has not ended the turn right away.
-                if self.player_status['num_reserves'] == 0:
-                    print "num_reserves is 0, retrying...\n"
-                    time.sleep(config.POLL_TIME)
-                    self._refresh_state()
-                    continue # Redo all the initial checks of the loop
+                # if self.player_status['num_reserves'] == 0:
+                #     print "num_reserves is 0, retrying...\n"
+                #     time.sleep(config.POLL_TIME)
+                #     self._refresh_state()
+                #     continue # Redo all the initial checks of the loop
                 self.do_reinforce()
 
                 print "Attacking..."

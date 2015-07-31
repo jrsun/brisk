@@ -162,7 +162,7 @@ def evaluate(map_layout, player_status, enemy_status): # 0.0001
         more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.1 + \
         occupied_territories_feature(map_layout, player_status, enemy_status) * 0.2 + \
         our_expected_reinforcements_feature(map_layout, player_status, enemy_status) * 0.2 + \
-        own_occupied_continents_feature(map_layout, player_status, enemy_status) * 2.0
+        own_occupied_continents_feature(map_layout, player_status, enemy_status) * 1.0
 
 if __name__ == "__main__":
     import AIBase

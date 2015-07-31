@@ -1,3 +1,5 @@
+import json
+
 def pp(jsonObject):
     ''' Pretty prints json '''
     print json.dumps(jsonObject, indent=4)
