@@ -1,6 +1,6 @@
 import features
 from utils import get_territory_by_id
-import copy
+import copy, time
 
 class Fortify_Evaluator():
     def __init__(self):
@@ -29,4 +29,5 @@ if __name__ == "__main__":
     b._refresh_state()
     source, dest = b._create_set_of_legal_fortifications()[0]
     possible_action = (source, dest, source['num_armies'] - 1)
+    print features.evaluate(b.map_layout, b.player_status, b.get_enemy_status())
     print r.evaluate_action(possible_action, b.map_layout, b.player_status, b.get_enemy_status())
