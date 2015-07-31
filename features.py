@@ -1,13 +1,13 @@
 import time
     
 # 4.5.1
-def armies_feature():
+def armies_feature(map_layout, player_status, enemy_status):
     return float(player_status['num_armies']) / (player_status['num_armies'] + enemy_status['num_armies'])
 
 # TODO: 4.5.2 - 4.5.5
 
 # 4.5.6
-def enemy_expected_reinforcements_feature():
+def enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status):
     enemy_expected_reinforcements = max(len(enemy_status['territories']) / 3, 3)
     enemy_territory_ids = [t['territory'] for t in enemy_status['territories']]
     for c in map_layout['continents']:
@@ -16,7 +16,7 @@ def enemy_expected_reinforcements_feature():
     return enemy_expected_reinforcements
 
 # 4.5.7
-def enemy_occupied_continents_feature():
+def enemy_occupied_continents_feature(map_layout, player_status, enemy_status):
     enemy_occupied_continents = 0
     enemy_territory_ids = [t['territory'] for t in enemy_status['territories']]
     for c in map_layout['continents']:
@@ -25,7 +25,7 @@ def enemy_occupied_continents_feature():
     return enemy_occupied_continents
 
 # 4.5.8
-def hinterland_feature():
+def hinterland_feature(map_layout, player_status, enemy_status):
     hinterlands = 0
     enemy_territory_ids = [t['territory'] for t in enemy_status['territories']]
     player_territory_ids = [t['territory'] for t in player_status['territories']]
@@ -39,7 +39,7 @@ def hinterland_feature():
     return hinterlands
 
 # 4.5.10
-def more_than_one_army_feature():
+def more_than_one_army_feature(map_layout, player_status, enemy_status):
     fortified = 0
     total = 0
     for t in player_status['territories']:
@@ -49,11 +49,11 @@ def more_than_one_army_feature():
     return float(fortified) / total
 
 # 4.5.11
-def occupied_territories_feature():
+def occupied_territories_feature(map_layout, player_status, enemy_status):
     return float(len(player_status['territories'])) / (len(player_status['territories']) + len(enemy_status['territories']))
 
 # 4.5.12
-def our_expected_reinforcements_feature():
+def our_expected_reinforcements_feature(map_layout, player_status, enemy_status):
     our_expected_reinforcements = max(len(player_status['territories']) / 3, 3)
     player_territory_ids = set([t['territory'] for t in player_status['territories']])
     for c in map_layout['continents']:
@@ -62,7 +62,7 @@ def our_expected_reinforcements_feature():
     return our_expected_reinforcements
 
 # 4.5.13
-def own_occupied_continents_feature():
+def own_occupied_continents_feature(map_layout, player_status, enemy_status):
     player_occupied_continents = 0
     player_territory_ids = [t['territory'] for t in player_status['territories']]
     for c in map_layout['continents']:
@@ -93,15 +93,15 @@ def own_occupied_continents_feature():
     #     our_expected_reinforcements_feature() * 0.2 + \
     #     own_occupied_continents_feature() * 1.0
 
-def evaluate():
-    return armies_feature() * 0.6 + \
-        enemy_expected_reinforcements_feature() * -0.3 + \
-        enemy_occupied_continents_feature() * -0.3 + \
-        hinterland_feature() * 0.3 + \
-        more_than_one_army_feature() * -0.1 + \
-        occupied_territories_feature() * 0.2 + \
-        our_expected_reinforcements_feature() * 0.2 + \
-        own_occupied_continents_feature() * 1.0
+def evaluate(map_layout, player_status, enemy_status):
+    return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
+        enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
+        enemy_occupied_continents_feature(map_layout, player_status, enemy_status) * -0.3 + \
+        hinterland_feature(map_layout, player_status, enemy_status) * 0.3 + \
+        more_than_one_army_feature(map_layout, player_status, enemy_status) * -0.1 + \
+        occupied_territories_feature(map_layout, player_status, enemy_status) * 0.2 + \
+        our_expected_reinforcements_feature(map_layout, player_status, enemy_status) * 0.2 + \
+        own_occupied_continents_feature(map_layout, player_status, enemy_status) * 1.0
 
 if __name__ == "__main__":
     import Brisk
