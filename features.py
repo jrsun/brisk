@@ -189,7 +189,7 @@ def partial_continent_score_feature(map_layout, player_status, enemy_status):
 def evaluate_reinforce(map_layout, player_status, enemy_status): # 0.0001
     # armies_feature is constant
     # return armies_feature(map_layout, player_status, enemy_status) * 0.6 + \
-    return continent_safety_feature(map_layout, player_status, enemy_status) * -20 + \
+    return continent_safety_feature(map_layout, player_status, enemy_status) * -50 + \
         continent_threat_feature(map_layout, player_status, enemy_status) * 1 + \
         enemy_expected_reinforcements_feature(map_layout, player_status, enemy_status) * -0.3 + \
         distance_to_frontier_feature(map_layout, player_status, enemy_status) * 10
