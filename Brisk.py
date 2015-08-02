@@ -14,7 +14,7 @@ class Brisk(object):
 
     def join_game(self, game_id, bot_id):
         # data = { 'join': True, 'team_name': self.TEAM_NAME, 'token': config.TOKEN, "no_bot": True, "game": 1662066685}
-        data = { 'join': True, 'team_name': self.TEAM_NAME }
+        data = { 'join': True, 'team_name': self.TEAM_NAME, 'no_bot': True }
         res = self.post(self.url_root(), data)
         return res
 

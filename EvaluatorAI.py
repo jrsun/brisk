@@ -51,7 +51,7 @@ class EvaluatorAI(AIBase.AIBase):
             battle = (src, dest)
             # score[random.random()] = battle
             score[self.be.evaluate_action(battle, self.map_layout, self.player_status, self.enemy_status)] = battle
-        if len(score) == 0 or max(score) - curr_score <= 0.5:
+        if len(score) == 0 or max(score) - curr_score <= 1:
             return None
         return score[max(score)]
 
